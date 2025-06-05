@@ -14,7 +14,6 @@ import Image from "next/image";
 import { Product } from "@/lib/types";
 
 const ProductModal = ({ product }: { product: Product }) => {
-  console.log("product :>> ", product);
   return (
     <Dialog>
       <DialogTrigger className="bg-orange-200 hover:bg-orange-300 text-orange-500 px-6 py-2 rounded-full shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150">
