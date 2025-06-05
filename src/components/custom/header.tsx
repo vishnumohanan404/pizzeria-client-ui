@@ -9,8 +9,20 @@ import {
 import Link from "next/link";
 import { Phone, ShoppingBasket } from "lucide-react";
 import { Button } from "../ui/button";
+import { Tenant } from "@/lib/types";
 
-const Header = () => {
+const Header = async () => {
+  const tenantsResponse = await fetch(
+    `${process.env.BACKEND_URL}/api/auth/tenants?perPage=100`,
+    {
+      next: {
+        revalidate: 3600, // 1hr
+      },
+    }
+  );
+
+  if (!tenantsResponse.ok) throw new Error("Failed to fetch tenants");
+  const restaurants: { data: Tenant[] } = await tenantsResponse.json();
   return (
     <header className="bg-white">
       <nav className="container py-5 flex justify-between items-center">
@@ -40,9 +52,13 @@ const Header = () => {
               <SelectValue placeholder="Select Restaurant" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-              <SelectItem value="system">System</SelectItem>
+              {restaurants.data?.map((restaurant) => {
+                return (
+                  <SelectItem value={restaurant.id} key={restaurant.id}>
+                    {restaurant.name}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
