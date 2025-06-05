@@ -1,3 +1,4 @@
+"use client";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +15,7 @@ import Image from "next/image";
 import { Product } from "@/lib/types";
 
 const ProductModal = ({ product }: { product: Product }) => {
+  const handleAddToCart = () => {};
   return (
     <Dialog>
       <DialogTrigger className="bg-orange-200 hover:bg-orange-300 text-orange-500 px-6 py-2 rounded-full shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150">
@@ -71,7 +73,7 @@ const ProductModal = ({ product }: { product: Product }) => {
             <ToppingList />
             <div className="flex items-center justify-between mt-12">
               <span className="font-bold">&#8377; 400</span>
-              <Button>
+              <Button onClick={handleAddToCart}>
                 <ShoppingCart size={20} />
                 <span className="ml-1">Add to cart</span>
               </Button>
