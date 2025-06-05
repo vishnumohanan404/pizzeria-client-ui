@@ -4,10 +4,17 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import ToppingList from "./topping-list";
 
 export type Product = {
   id: string;
@@ -41,6 +48,9 @@ const ProductCard = ({ product }: PropTypes) => {
             Choose
           </DialogTrigger>
           <DialogContent className="min-w-3xl p-0 ">
+            <VisuallyHidden>
+              <DialogTitle></DialogTitle>
+            </VisuallyHidden>
             <div className="flex">
               <div className="w-1/3 bg-white rounded p-8 flex items-center justify-center">
                 <Image
@@ -139,6 +149,7 @@ const ProductCard = ({ product }: PropTypes) => {
                     </div>
                   </RadioGroup>
                 </div>
+              <ToppingList />
               </div>
             </div>
           </DialogContent>
