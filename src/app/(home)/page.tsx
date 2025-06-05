@@ -1,60 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
-import ProductCard, { Product } from "./components/product-card";
-import { Category } from "@/lib/types";
-
-const products: Product[] = [
-  {
-    id: "1",
-    name: "Margherita Pizza",
-    description: "Classic pizza with fresh tomatoes, mozzarella, and basil.",
-    image: "/pizza-main.png",
-    price: 12.99,
-  },
-  {
-    id: "2",
-    name: "Margherita Pizza",
-    description: "Classic pizza with fresh tomatoes, mozzarella, and basil.",
-    image: "/pizza-main.png",
-    price: 12.99,
-  },
-  {
-    id: "3",
-    name: "Margherita Pizza",
-    description: "Classic pizza with fresh tomatoes, mozzarella, and basil.",
-    image: "/pizza-main.png",
-    price: 12.99,
-  },
-  {
-    id: "4",
-    name: "Margherita Pizza",
-    description: "Classic pizza with fresh tomatoes, mozzarella, and basil.",
-    image: "/pizza-main.png",
-    price: 12.99,
-  },
-  {
-    id: "5",
-    name: "Margherita Pizza",
-    description: "Classic pizza with fresh tomatoes, mozzarella, and basil.",
-    image: "/pizza-main.png",
-    price: 12.99,
-  },
-  {
-    id: "6",
-    name: "Margherita Pizza",
-    description: "Classic pizza with fresh tomatoes, mozzarella, and basil.",
-    image: "/pizza-main.png",
-    price: 12.99,
-  },
-  {
-    id: "7",
-    name: "Margherita Pizza",
-    description: "Classic pizza with fresh tomatoes, mozzarella, and basil.",
-    image: "/pizza-main.png",
-    price: 12.99,
-  },
-];
+import ProductCard from "./components/product-card";
+import { Category, Product } from "@/lib/types";
 
 export default async function Home() {
   const categoryResponse = await fetch(
@@ -63,11 +11,22 @@ export default async function Home() {
       next: { revalidate: 3600 },
     }
   );
-
   if (!categoryResponse.ok) {
     throw new Error("Failed to fetch categories");
   }
   const categories: Category[] = await categoryResponse.json();
+
+  // todo: add pagination in UI
+  const productsResponse = await fetch(
+    // todo: add dynamic product ID
+    `${process.env.BACKEND_URL}/api/catalog/products?perPage=100&tenantId=1`
+  );
+  console.log("categories :>> ", categories);
+  if (!productsResponse.ok) {
+    throw new Error("Failed to fetch products");
+  }
+  const products: { data: Product[] } = await productsResponse.json();
+  console.log("products.data :>> ", products.data);
   return (
     <>
       <section className="bg-white">
@@ -96,7 +55,7 @@ export default async function Home() {
       </section>
       <section>
         <div className="container py-12">
-          <Tabs defaultValue="pizza">
+          <Tabs defaultValue={categories[1]._id}>
             <TabsList>
               {categories.map((category) => (
                 <TabsTrigger
@@ -108,20 +67,21 @@ export default async function Home() {
                 </TabsTrigger>
               ))}
             </TabsList>
-            <TabsContent value="pizza">
-              <div className="grid grid-cols-4 gap-6 mt-6">
-                {products.map((product) => (
-                  <ProductCard product={product} key={product.id} />
-                ))}
-              </div>
-            </TabsContent>
-            <TabsContent value="beverages">
-              <div className="grid grid-cols-4 gap-6 mt-6">
-                {products.map((product) => (
-                  <ProductCard product={product} key={product.id} />
-                ))}
-              </div>
-            </TabsContent>
+            {categories.map((category) => {
+              return (
+                <TabsContent value={category._id} key={category._id}>
+                  <div className="grid grid-cols-4 gap-6 mt-6">
+                    {products.data
+                      .filter(
+                        (product) => product.category._id === category._id
+                      )
+                      ?.map((product) => (
+                        <ProductCard product={product} key={product._id} />
+                      ))}
+                  </div>
+                </TabsContent>
+              );
+            })}
           </Tabs>
         </div>
       </section>
