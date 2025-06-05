@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { Product } from "@/lib/types";
+import { Suspense } from "react";
 
 const ProductModal = ({ product }: { product: Product }) => {
   const handleAddToCart = () => {};
@@ -69,8 +70,9 @@ const ProductModal = ({ product }: { product: Product }) => {
                 );
               }
             )}
-
-            <ToppingList />
+            <Suspense fallback={"Topping loading"}>
+              <ToppingList />
+            </Suspense>
             <div className="flex items-center justify-between mt-12">
               <span className="font-bold">&#8377; 400</span>
               <Button onClick={handleAddToCart}>
