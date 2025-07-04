@@ -12,7 +12,7 @@ import ToppingList from "./topping-list";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
-import { Product } from "@/lib/types";
+import { Product, Topping } from "@/lib/types";
 import { startTransition, Suspense, useState } from "react";
 
 type ChosenConfig = {
@@ -20,6 +20,22 @@ type ChosenConfig = {
 };
 const ProductModal = ({ product }: { product: Product }) => {
   const [chosenConfig, setChosenConfig] = useState<ChosenConfig>();
+  const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
+
+  const handleCheckBoxCheck = (topping: Topping) => {
+    const isAlreadyExists = selectedToppings.some(
+      (element) => element.id === topping.id
+    );
+    startTransition(() => {
+      if (isAlreadyExists) {
+        setSelectedToppings((prev) =>
+          prev.filter((elm) => elm.id !== topping.id)
+        );
+        return;
+      }
+      setSelectedToppings((prev) => [...prev, topping]);
+    });
+  };
   const handleAddToCart = () => {};
   const handleRadioChange = (key: string, data: string) => {
     startTransition(() => {
@@ -86,7 +102,10 @@ const ProductModal = ({ product }: { product: Product }) => {
               }
             )}
             <Suspense fallback={"Topping loading"}>
-              <ToppingList />
+              <ToppingList
+                selectedToppings={selectedToppings}
+                handleCheckBoxCheck={handleCheckBoxCheck}
+              />
             </Suspense>
             <div className="flex items-center justify-between mt-12">
               <span className="font-bold">&#8377; 400</span>
