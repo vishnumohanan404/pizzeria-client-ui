@@ -13,7 +13,7 @@ export interface CartItem {
 }
 
 export interface CartState {
-  cartItems: CartItem[];  
+  cartItems: CartItem[];
 }
 
 const initialState: CartState = {
@@ -25,24 +25,29 @@ export const cartSlice = createSlice({
   initialState,
   reducers: {
     addToCart: (state, action: PayloadAction<CartItem>) => {
+      const newItem = {
+        product: action.payload.product,
+        chosenConfiguration: action.payload.chosenConfiguration,
+      };
+      window.localStorage.setItem(
+        "cartItems",
+        JSON.stringify([...state.cartItems, newItem])
+      );
       // Redux Toolkit allows us to write "mutating" logic in reducers. It
       // doesn't actually mutate the state because it uses the Immer library,
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes
       return {
-        cartItems: [
-          ...state.cartItems,
-          {
-            product: action.payload.product,
-            chosenConfiguration: action.payload.chosenConfiguration,
-          },
-        ],
+        cartItems: [...state.cartItems, newItem],
       };
+    },
+    setInitialCart: (state, action: PayloadAction<CartItem[]>) => {
+      state.cartItems.push(...action.payload);
     },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { addToCart } = cartSlice.actions;
+export const { addToCart, setInitialCart } = cartSlice.actions;
 
 export default cartSlice.reducer;

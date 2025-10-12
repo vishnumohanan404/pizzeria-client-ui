@@ -1,11 +1,9 @@
-"use client";
-import { useAppDispatch, useAppSelector } from "@/lib/store/hooks/hooks";
+import { useAppSelector } from "@/lib/store/hooks/hooks";
 import { ShoppingBasket } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
 const CartCounter = () => {
-  const dispatch = useAppDispatch();
   const cartItems = useAppSelector((state) => state.cart.cartItems);
   return (
     <>

@@ -2,6 +2,7 @@
 import { useRef } from "react";
 import { Provider } from "react-redux";
 import { makeStore, AppStore } from "@/lib/store/store";
+import { setInitialCart } from "@/lib/store/features/cart/cartSlice";
 
 export default function StoreProvider({
   children,
@@ -12,7 +13,20 @@ export default function StoreProvider({
   if (!storeRef.current) {
     // Create the store instance the first time this renders
     storeRef.current = makeStore();
-    // todo: set initial cart data from localStorage
+    // set initial cart data from localStorage
+    const isLocalStorageAvailable =
+      typeof window !== "undefined" && window.localStorage;
+    if (isLocalStorageAvailable) {
+      const cartItems = window.localStorage.getItem("cartItems");
+      if (cartItems) {
+        try {
+          const parsedItems = JSON.parse(cartItems as string);
+          storeRef.current.dispatch(setInitialCart(parsedItems));
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
   }
 
   return <Provider store={storeRef.current}>{children}</Provider>;
