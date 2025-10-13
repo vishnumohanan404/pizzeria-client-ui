@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { Product, Topping } from "@/lib/types";
-import { startTransition, Suspense, useState } from "react";
+import { startTransition, Suspense, useMemo, useState } from "react";
 import { useAppDispatch } from "@/lib/store/hooks/hooks";
 import { addToCart } from "@/lib/store/features/cart/cartSlice";
 
@@ -37,6 +37,21 @@ const ProductModal = ({ product }: { product: Product }) => {
     defaultConfiguration as unknown as ChosenConfig
   );
   const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
+
+  const totalPrice = useMemo(() => {
+    const toppingsTotal = selectedToppings.reduce(
+      (acc, curr) => acc + curr.price,
+      0
+    );
+    const configTotal = Object.entries(chosenConfig).reduce(
+      (acc, [key, val]: [string, string]) => {
+        const price = product.priceConfiguration[key].availableOptions[val];
+        return acc + price;
+      },
+      0
+    );
+    return toppingsTotal + configTotal;
+  }, [chosenConfig, selectedToppings]);
 
   const handleCheckBoxCheck = (topping: Topping) => {
     const isAlreadyExists = selectedToppings.some(
@@ -135,7 +150,7 @@ const ProductModal = ({ product }: { product: Product }) => {
               />
             </Suspense>
             <div className="flex items-center justify-between mt-12">
-              <span className="font-bold">&#8377; 400</span>
+              <span className="font-bold">&#8377; {totalPrice}</span>
               <Button onClick={() => handleAddToCart(product)}>
                 <ShoppingCart size={20} />
                 <span className="ml-1">Add to cart</span>
