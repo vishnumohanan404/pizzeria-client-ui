@@ -143,12 +143,16 @@ const ProductModal = ({ product }: { product: Product }) => {
                 );
               }
             )}
-            <Suspense fallback={"Topping loading"}>
-              <ToppingList
-                selectedToppings={selectedToppings}
-                handleCheckBoxCheck={handleCheckBoxCheck}
-              />
-            </Suspense>
+            {/* todo: make this condition dynamic & scalable - add a new field in category object like "hasToppings" then show the toppings list */}
+            {product.category.name === "Pizza" && (
+              <Suspense fallback={"Topping loading"}>
+                <ToppingList
+                  selectedToppings={selectedToppings}
+                  handleCheckBoxCheck={handleCheckBoxCheck}
+                />
+              </Suspense>
+            )}
+
             <div className="flex items-center justify-between mt-12">
               <span className="font-bold">&#8377; {totalPrice}</span>
               <Button onClick={() => handleAddToCart(product)}>
