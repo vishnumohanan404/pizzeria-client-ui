@@ -14,13 +14,15 @@ import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { Product, Topping } from "@/lib/types";
 import { startTransition, Suspense, useMemo, useState } from "react";
-import { useAppDispatch } from "@/lib/store/hooks/hooks";
-import { addToCart } from "@/lib/store/features/cart/cartSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks/hooks";
+import { addToCart, CartItem } from "@/lib/store/features/cart/cartSlice";
+import { hashTheItem } from "@/lib/utils";
 
 type ChosenConfig = {
   [key: string]: string;
 };
 const ProductModal = ({ product }: { product: Product }) => {
+  const cartItem = useAppSelector((state) => state.cart.cartItems);
   const dispatch = useAppDispatch();
 
   const defaultConfiguration = Object.entries(
@@ -53,6 +55,23 @@ const ProductModal = ({ product }: { product: Product }) => {
     return toppingsTotal + configTotal;
   }, [chosenConfig, selectedToppings]);
 
+  const alreadyHasInCart = useMemo(() => {
+    const currentConfiguration = {
+      _id: product._id,
+      name: product.name,
+      image: product.image,
+      priceConfiguration: product.priceConfiguration,
+      chosenConfiguration: {
+        priceConfiguration: { ...chosenConfig },
+        selectedToppings: selectedToppings,
+      },
+      qty: 1,
+    };
+
+    const hash = hashTheItem(currentConfiguration);
+    return cartItem.some((item) => item.hash === hash);
+  }, [product, chosenConfig, selectedToppings, cartItem]);
+
   const handleCheckBoxCheck = (topping: Topping) => {
     const isAlreadyExists = selectedToppings.some(
       (element) => element.id === topping.id
@@ -69,12 +88,16 @@ const ProductModal = ({ product }: { product: Product }) => {
   };
 
   const handleAddToCart = (product: Product) => {
-    const itemToAdd = {
-      product,
+    const itemToAdd: CartItem = {
+      _id: product._id,
+      name: product.name,
+      image: product.image,
+      priceConfiguration: product.priceConfiguration,
       chosenConfiguration: {
         priceConfiguration: chosenConfig!,
         selectedToppings: selectedToppings,
       },
+      qty: 1,
     };
     dispatch(addToCart(itemToAdd));
   };
@@ -155,9 +178,15 @@ const ProductModal = ({ product }: { product: Product }) => {
 
             <div className="flex items-center justify-between mt-12">
               <span className="font-bold">&#8377; {totalPrice}</span>
-              <Button onClick={() => handleAddToCart(product)}>
+              <Button
+                disabled={alreadyHasInCart}
+                onClick={() => handleAddToCart(product)}
+                className={alreadyHasInCart ? "bg-gray-700" : "bg-primary"}
+              >
                 <ShoppingCart size={20} />
-                <span className="ml-1">Add to cart</span>
+                <span className="ml-1">
+                  {alreadyHasInCart ? "Already in cart" : "Add to cart"}
+                </span>
               </Button>
             </div>
           </div>
